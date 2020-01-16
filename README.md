@@ -1,18 +1,18 @@
 # Docgreen Esa 5000 Arduino Setspeed Button
-Use This Arduino Sketch And Connect Your Arduino To Your Docgreen Esa 5000 Escooter. You Can Define A Sequence That You Have To Press The Powerbutton Of Your Scooter To Set A New Speed Limit.
+Use this arduino sketch and connect your arduino to your docgreen ESA 5000 Escooter. You can define a sequence that you have to press the powerbutton of your scooter to set a new speed limit.
 
 
 # Connect Your Arduino 
 Connect your arduino like in this project: https://Github.Com/M4gnv5/Docgreenesa5000-Dashboard
-5v Power And Databus Should Now Connected Between The Scooter And Your Arduino.
+5V power and databus should now connected between the scooter and your arduino.
 
-Now You Have To Connect The Yellow Cable That Connects The Scooters Dashboard With The Scooters Controller Motherboard. It Gets Pulled To Ground When You Press The Button. You Have To Use An Diode And An Pullup Resistor As Shown In The Following Picture:
+Now you have to connect the yellow cable that connects the scooters dashboard with the scooters controller motherboard. It gets pulled to ground when you press the button. You have to use a diode and a pullup resistor as shown in the following picture:
 
 ![](pictures/arduino.png)
 
-When You Use This Sketch Without Modification, You Have To Connect The Button To Pin 14 On Your Arduino.
+When you use this sketch without modification, you have to connect the button to Pin 14 on your arduino.
 
 # Usage
 
-After Turning On Your Scooter, The Arduino Will Get Powered Too. Klick 6 Times Fast On The Power Button And The Scooters Max Speed Will Be 30 Kilometers/H. Three More Times And The Scooters Max Speed Will Reset To Default 20 Km/H. You Now Have To Turn Your Scooter Off And On Again.
+After turning on your scooter, the arduino will get powered too. Klick 6 times fast on the power button and the scooters max speed will be 30 kilometers/h. Three more times and the scooters max speed will reset to default 20 kilometers/h. You now have to turn your scooter off and on again.
 
