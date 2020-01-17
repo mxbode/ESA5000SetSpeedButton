@@ -22,49 +22,6 @@ uint16_t calculateChecksum(uint8_t *data)
   return sum;
 }
 
-void transmitPacket(uint8_t throttle, uint8_t brake)
-{
-  static int counter = 0;
-
-  uint8_t fifthHeader[] = {
-    0x09, 0x27, 0x63, 0x07, 0x06,
-  };
-  uint8_t regularHeader[] = {
-    0x07, 0x25, 0x60, 0x05, 0x04,
-  };
-
-  uint8_t data[] = {
-    0, 0, 0, 0, 0, // header, will be either regularHeader or fifthHeader
-    throttle, // range 0x2C - 0xC5
-    brake, // range 0x2C - 0xB5
-    0x00, 0x00, // ?
-    0x00, 0x04, // ?, only present on every fith package
-    0x00, 0x00, // checksum
-  };
-
-  uint8_t len;
-  if (counter == 4)
-  {
-    len = 13;
-    memcpy(data, fifthHeader, 5);
-
-    counter = 0;
-  }
-  else
-  {
-    len = 11;
-    memcpy(data, regularHeader, 5);
-
-    counter++;
-  }
-
-  // XXX we assume our architecture uses LE order here
-  *(uint16_t *)&data[len - 2] = calculateChecksum(data);
-
-  ScooterSerial.write(0x55);
-  ScooterSerial.write(0xAA);
-  ScooterSerial.write(data, len);
-}
 
 void setSpeed(const int speed) { //Setze Maximalgeschwindigkeit in km/h
   uint8_t data[] = {
@@ -118,8 +75,6 @@ bool checkCode(int presses) {
          }
 
          temp = millis();
-                                    // Serial.print("time: ");
-                            //Serial.println((temp-time));
          if((temp-time) < 1650 && (temp-time) > 500) return true;
 
 }
@@ -139,8 +94,8 @@ void loop()
 {
            if(checkCode(presses)) {
             digitalWrite(LED_BUILTIN, HIGH);
-            delay(500);
             setSpeed(speed);
+            delay(500);
             presses=3;
             speed=20;
             digitalWrite(LED_BUILTIN, LOW);
