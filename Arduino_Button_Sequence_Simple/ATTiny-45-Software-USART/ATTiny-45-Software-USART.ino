@@ -5,6 +5,8 @@
 SoftwareSerial ScooterSerial(3,4);
 #define BUTTON_PIN 2
 #define RESEND 4
+#define MILLISPERPRESS 275
+#define MINMILLISPERPRESS (presses*100)
 
 int speed = 30;
 int presses=5;
@@ -37,21 +39,11 @@ void setSpeed(const int speed) { //Setze Maximalgeschwindigkeit in km/h
     }
     ScooterSerial.write(data, sizeof(data) / sizeof(uint8_t));
   }
-
 }
 
-bool waitwhilepress() {
+bool waitpress(int signal) {
           int i=0;
-           while(digitalRead(BUTTON_PIN) == LOW) {
-              delay(50);
-              if(i>2) return false;
-              i++;
-            }
-            return true;
-}
-bool waitforpress() {
-          int i=0;
-           while(digitalRead(BUTTON_PIN) == HIGH) {
+           while(digitalRead(BUTTON_PIN) == signal) {
               delay(50);
               if(i>2) return false;
               i++;
@@ -66,23 +58,20 @@ bool checkCode(int presses) {
       if(digitalRead(BUTTON_PIN) == HIGH) return false;
          time = millis();
          for(int i=0; i<(presses+1); i++) {
-                   if(!waitwhilepress()) return false;
+                   if(!waitpress(LOW)) return false;
                    delay(50);
-                   if(!waitforpress()) return false;
+                   if(!waitpress(HIGH)) return false;
                    delay(50);
          }
 
          temp = millis();
-         if((temp-time) < 1650 && (temp-time) > 500) return true;
-
+         if((temp-time) < (MILLISPERPRESS*presses) && (temp-time) > MINMILLISPERPRESS) return true;
 }
 
 void setup()
 {
   pinMode(BUTTON_PIN, INPUT);
   ScooterSerial.begin(115200);
-
-
 }
 
 void loop()
