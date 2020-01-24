@@ -1,13 +1,18 @@
 #include <SoftwareSerial.h>
 #include <Arduino.h>
 #include <stdint.h>
+#include <avr/power.h>
+#include <avr/sleep.h>
 
-SoftwareSerial ScooterSerial(3,4);
-#define BUTTON_PIN 2
-#define RESEND 4
-#define MILLISPERPRESS 275
-#define MINMILLISPERPRESS (presses*100)
 
+#define TX_PIN 3                            // PIN for [TR] on scooter
+#define BUTTON_PIN 2                        // PIN for [SW] on scooter
+#define RESEND 4                            // times that we send the speed unlock message to scooter data bus
+#define MILLISPERPRESS 280                  // max time in millis that a press or time between presses are allowed to last: rounded to x*10
+#define MINMILLISPERPRESS (presses*100)     // minimum time in millis for the whole unlock procedure for debounce (example: 5 times x 100 millis: fastest 500 millis)
+#define UNLOCKAFTERPOWERON false            // ignore buttons.... unlock after qC gets powered on
+
+SoftwareSerial ScooterSerial(TX_PIN, 4);
 int speed = 30;
 int presses=5;
 
@@ -21,7 +26,6 @@ uint16_t calculateChecksum(uint8_t *data)
   sum ^= 0xFFFF;
   return sum;
 }
-
 
 void setSpeed(const int speed) { //Setze Maximalgeschwindigkeit in km/h
   uint8_t data[] = {
@@ -44,8 +48,8 @@ void setSpeed(const int speed) { //Setze Maximalgeschwindigkeit in km/h
 bool waitpress(int signal) {
           int i=0;
            while(digitalRead(BUTTON_PIN) == signal) {
-              delay(50);
-              if(i>2) return false;
+              delay(10);
+              if(i>(MILLISPERPRESS/10)) return false;
               i++;
             }
             return true;
@@ -76,10 +80,22 @@ void setup()
 
 void loop()
 {
-           if(checkCode(presses)) {
-            setSpeed(speed);
-            presses=3;
-            speed=20;
-           }
-           delay(50);
+  if(UNLOCKAFTERPOWERON) {
+    setSpeed(speed);
+    delay(150);
+  } else {
+    if(checkCode(presses)) {
+      setSpeed(speed);
+      presses=3;
+      speed=20;
+      if(speed == 20) { // end of program; we can sleep now; please reboot the scooter
+        power_all_disable();
+        set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+        sleep_enable();
+        sleep_mode();
+        sleep_disable();
+      } //if(speed == 20)
+    } //if(checkCode(presses))
+  }
+  delay(50);
 }
