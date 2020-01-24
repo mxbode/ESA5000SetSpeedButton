@@ -12,16 +12,14 @@ Use this arduino sketch and connect your arduino to your docgreen ESA 5000 Escoo
 Connect your arduino like in this project: https://Github.Com/M4gnv5/Docgreenesa5000-Dashboard
 5V power and databus should now connected between the scooter and your arduino.
 
-Now you have to connect the green cable that connects the scooters dashboard with the scooters controller motherboard. It gets pulled to ground/0V when you press the button. You have to use a diode and a pullup resistor as shown in the following picture:
+In generic Arduino you have to connect TX PIN throug a diode to [TR] on scooter and PIN 14 throug a diode to [SW] on scooter. Use the diode as shown in ATtiny picture below.
+
+For ATtiny you have to connect PIN 4 throug a diode to [TR] on escooter and PIN 2 throug a diode to [SW] on escooter.
 
 ![](pictures/arduino.png)
-![alt text](https://camo.githubusercontent.com/a912641249173768ae60670e843c62294d06da4f/68747470733a2f2f656c656374726f2e636c75622f646174612f666f72756d2f6d657373616765732f34323633312f696d616765732f31313636302d313238302e6a7067)
-
-When you use this sketch without modification, you have to connect the button to Pin 14 on your arduino.
-
-ATtiny45: Use PIN 4 for Databus (with Diode as in Picture above) and PIN 2 as Button PIN (with Diode as in Picture above).
 
 ![](pictures/tiny45.jpg)
+
 
 # Usage
 
