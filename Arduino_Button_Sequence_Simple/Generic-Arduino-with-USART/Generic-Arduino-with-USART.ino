@@ -1,15 +1,18 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <stdint.h>
+#include <avr/power.h>
+#include <avr/sleep.h>
+
+#define BUTTON_PIN 14                       // PIN for [SW] on scooter
+#define RESEND 4                            // times that we send the speed unlock message to scooter data bus
+#define MILLISPERPRESS 280                  // max time in millis that a press or time between presses are allowed to last: rounded to x*10
+#define MINMILLISPERPRESS (presses*100)     // minimum time in millis for the whole unlock procedure for debounce (example: 5 times x 100 millis: fastest 500 millis)
+#define UNLOCKAFTERPOWERON false            // ignore buttons.... unlock after qC gets powered on
 
 #define ScooterSerial Serial
 #define RX_DISABLE UCSR0B &= ~_BV(RXEN0);
 #define RX_ENABLE  UCSR0B |=  _BV(RXEN0);
-#define BUTTON_PIN 14
-#define RESEND 4
-#define MILLISPERPRESS 275
-#define MINMILLISPERPRESS (presses*100)
-
 int speed = 30;
 int presses=5;
 
@@ -47,8 +50,8 @@ void setSpeed(const int speed) { //Setze Maximalgeschwindigkeit in km/h
 bool waitpress(int signal) {
           int i=0;
            while(digitalRead(BUTTON_PIN) == signal) {
-              delay(50);
-              if(i>2) return false;
+              delay(10);
+              if(i>(MILLISPERPRESS/10)) return false;
               i++;
             }
             return true;
@@ -82,13 +85,26 @@ void setup()
 
 void loop()
 {
-           if(checkCode(presses)) {
-            digitalWrite(LED_BUILTIN, HIGH);
-            setSpeed(speed);
-            delay(500);
-            presses=3;
-            speed=20;
-            digitalWrite(LED_BUILTIN, LOW);
-           }
-           delay(50);
+  if(UNLOCKAFTERPOWERON) {
+    setSpeed(speed);
+    delay(150);
+  } else {
+    if(checkCode(presses)) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      setSpeed(speed);     
+      if(speed == 20) { // end of program; we can sleep now; please reboot the scooter
+        power_all_disable();
+        set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+        sleep_enable();
+        sleep_mode();
+        sleep_disable();
+      }
+      delay(500);
+      presses=3;
+      speed=20;
+      digitalWrite(LED_BUILTIN, LOW);
+    }
+  }
+  
+  delay(50);
 }
