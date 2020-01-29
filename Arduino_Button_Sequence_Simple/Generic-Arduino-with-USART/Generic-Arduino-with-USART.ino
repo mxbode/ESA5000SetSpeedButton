@@ -91,12 +91,7 @@ void loop()
   } else {
     if(checkCode(presses)) {
       digitalWrite(LED_BUILTIN, HIGH);
-      setSpeed(speed);
-      delay(500);
-      presses=3;
-      speed=20;
-      digitalWrite(LED_BUILTIN, LOW);
-     
+      setSpeed(speed);     
       if(speed == 20) { // end of program; we can sleep now; please reboot the scooter
         power_all_disable();
         set_sleep_mode(SLEEP_MODE_PWR_DOWN);
@@ -104,6 +99,10 @@ void loop()
         sleep_mode();
         sleep_disable();
       }
+      delay(500);
+      presses=3;
+      speed=20;
+      digitalWrite(LED_BUILTIN, LOW);
     }
   }
   

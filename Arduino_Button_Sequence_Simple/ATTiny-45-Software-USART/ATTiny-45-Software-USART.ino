@@ -86,8 +86,6 @@ void loop()
   } else {
     if(checkCode(presses)) {
       setSpeed(speed);
-      presses=3;
-      speed=20;
       if(speed == 20) { // end of program; we can sleep now; please reboot the scooter
         power_all_disable();
         set_sleep_mode(SLEEP_MODE_PWR_DOWN);
@@ -95,6 +93,8 @@ void loop()
         sleep_mode();
         sleep_disable();
       } //if(speed == 20)
+      presses=3;
+      speed=20;
     } //if(checkCode(presses))
   }
   delay(50);
